@@ -1,0 +1,1 @@
+# cloud-logging-logback-scala
