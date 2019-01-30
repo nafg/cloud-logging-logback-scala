@@ -78,6 +78,9 @@ object CloudJsonLoggingAppender {
       m.getName
   }
 
+  val legalNameChars = ('a' to 'z').toSet ++ ('A' to 'Z') ++ ('0' to '9') ++ Set('/', '_', '-', '.')
+  def legalizeNameChar(c: Char) = if (legalNameChars(c)) c else '-'
+
   def logEntryFor(e: ILoggingEvent) = {
     val level = e.getLevel
 
@@ -133,7 +136,7 @@ object CloudJsonLoggingAppender {
 
     LogEntry
       .newBuilder(Payload.JsonPayload.of(payload.asJava))
-      .setLogName(e.getLoggerName)
+      .setLogName(e.getLoggerName.map(legalizeNameChar))
       .setTimestamp(e.getTimeStamp)
       .setSeverity(severityFor(level))
       .setLabels(labels.asJava)
