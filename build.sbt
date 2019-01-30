@@ -1,6 +1,6 @@
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / organization := "io.github.nafg.cloudlogging"
-ThisBuild / version := "0.1"
+ThisBuild / version := "0.2"
 
 lazy val marker =
   project
