@@ -7,13 +7,14 @@ import java.util.Collections
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
+import io.github.nafg.cloudlogging.marker.JsonMarker
+
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.{ILoggingEvent, IThrowableProxy, ThrowableProxy}
 import com.google.cloud.logging.Logging.WriteOption
 import com.google.cloud.logging.logback.LoggingAppender
 import com.google.cloud.logging.{Option => _, _}
 import io.circe.{Json, JsonNumber, JsonObject}
-import io.github.nafg.cloudlogging.marker.JsonMarker
 import org.slf4j.Marker
 
 
@@ -59,7 +60,7 @@ object CloudJsonLoggingAppender {
     override def onArray(value: Vector[Json]) =
       value.map(_.foldWith[Any](JsonToRaw)).asJava
     override def onObject(value: JsonObject) =
-      value.toMap.mapValues(_.foldWith[Any](JsonToRaw)).asJava
+      value.toMap.map { case (k, v) => (k, v.foldWith[Any](JsonToRaw)) }.asJava
   }
 
   def marker: Marker => Any = {
