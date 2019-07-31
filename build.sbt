@@ -13,6 +13,6 @@ lazy val appender =
   project
     .dependsOn(marker)
     .settings(
-      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.101.0-alpha",
+      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.103.0-alpha",
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
     )
