@@ -5,7 +5,7 @@ ThisBuild / version := "0.2"
 lazy val marker =
   project
     .settings(
-      libraryDependencies += "io.circe" %% "circe-core" % "0.11.1",
+      libraryDependencies += "io.circe" %% "circe-core" % "0.12.1",
       libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.28"
     )
 
