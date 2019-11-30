@@ -9,12 +9,12 @@ import ch.qos.logback.classic.{Level, LoggerContext}
 import com.google.cloud.logging.{Payload, Severity}
 import io.circe.Json
 import io.github.nafg.cloudlogging.marker.JsonMarker
-import org.scalatest.FunSuite
 import org.scalatest.Inside._
 import org.slf4j.Marker
+import org.scalatest.funsuite.AnyFunSuite
 
 
-class CloudJsonLoggingAppenderTests extends FunSuite {
+class CloudJsonLoggingAppenderTests extends AnyFunSuite {
   test("Exception") {
     val loggingEvent: ILoggingEvent = new ILoggingEvent {
       override val getThreadName: String = Thread.currentThread().getName
