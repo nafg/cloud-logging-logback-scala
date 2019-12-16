@@ -2,6 +2,8 @@ ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / organization := "io.github.nafg.cloudlogging"
 ThisBuild / version := "0.2"
 
+ThisBuild / scalacOptions -= "-Xfatal-warnings"
+
 lazy val marker =
   project
     .settings(
