@@ -1,4 +1,6 @@
-ThisBuild / scalaVersion := "2.12.10"
+ThisBuild / crossScalaVersions := Seq("2.12.10", "2.13.1")
+ThisBuild / scalaVersion := (ThisBuild / crossScalaVersions).value.last
+
 ThisBuild / organization := "io.github.nafg.cloudlogging"
 ThisBuild / version := "0.2"
 
