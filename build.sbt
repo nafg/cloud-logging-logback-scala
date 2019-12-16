@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / scalaVersion := "2.12.10"
 ThisBuild / organization := "io.github.nafg.cloudlogging"
 ThisBuild / version := "0.2"
 
@@ -17,7 +17,7 @@ lazy val appender =
     .dependsOn(marker)
     .settings(
       noFatalWarnings,
-      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.111.0-alpha",
+      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.116.0-alpha",
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % Test
     )
 

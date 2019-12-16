@@ -1,1 +1,1 @@
-addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.9")
+addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.10")
