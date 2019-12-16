@@ -20,3 +20,5 @@ lazy val appender =
       libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.111.0-alpha",
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % Test
     )
+
+publish / skip := true
