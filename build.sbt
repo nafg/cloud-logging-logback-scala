@@ -1,8 +1,7 @@
-ThisBuild / crossScalaVersions := Seq("2.13.5", "2.13.1")
+ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.1")
 ThisBuild / scalaVersion := (ThisBuild / crossScalaVersions).value.last
 
 ThisBuild / organization := "io.github.nafg.cloudlogging"
-ThisBuild / version := "0.3"
 
 val noFatalWarnings = scalacOptions -= "-Xfatal-warnings"
 
@@ -20,7 +19,7 @@ lazy val appender =
     .settings(
       noFatalWarnings,
       libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.118.7-alpha",
-      libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.4" % Test
+      libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.6" % Test
     )
 
 publish / skip := true
