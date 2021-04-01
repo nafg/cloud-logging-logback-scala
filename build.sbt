@@ -19,7 +19,7 @@ lazy val appender =
     .settings(
       noFatalWarnings,
       libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.118.7-alpha",
-      libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.6" % Test
+      libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.7" % Test
     )
 
 publish / skip := true
