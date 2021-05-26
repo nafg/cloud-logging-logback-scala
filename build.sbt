@@ -9,7 +9,7 @@ lazy val marker =
   project
     .settings(
       noFatalWarnings,
-      libraryDependencies += "io.circe" %% "circe-core" % "0.14.0",
+      libraryDependencies += "io.circe" %% "circe-core" % "0.14.1",
       libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.30"
     )
 
