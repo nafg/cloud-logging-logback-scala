@@ -10,7 +10,7 @@ lazy val marker =
     .settings(
       noFatalWarnings,
       libraryDependencies += "io.circe" %% "circe-core" % "0.14.1",
-      libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.33"
+      libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.34"
     )
 
 lazy val appender =
