@@ -1,6 +1,6 @@
 package io.github.nafg.cloudlogging.marker
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import io.circe.Json
 import org.slf4j.Marker

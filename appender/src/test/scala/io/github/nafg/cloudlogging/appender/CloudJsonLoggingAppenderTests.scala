@@ -2,16 +2,17 @@ package io.github.nafg.cloudlogging.appender
 
 import java.util
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+
+import io.github.nafg.cloudlogging.marker.JsonMarker
 
 import ch.qos.logback.classic.spi._
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.google.cloud.logging.{Payload, Severity}
 import io.circe.Json
-import io.github.nafg.cloudlogging.marker.JsonMarker
 import org.scalatest.Inside._
-import org.slf4j.Marker
 import org.scalatest.funsuite.AnyFunSuite
+import org.slf4j.Marker
 
 
 class CloudJsonLoggingAppenderTests extends AnyFunSuite {

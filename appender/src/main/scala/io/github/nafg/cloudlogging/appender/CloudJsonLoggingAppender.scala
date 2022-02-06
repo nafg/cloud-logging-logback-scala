@@ -4,7 +4,7 @@ import java.io.{PrintWriter, StringWriter}
 import java.util
 import java.util.Collections
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 import io.github.nafg.cloudlogging.marker.JsonMarker
