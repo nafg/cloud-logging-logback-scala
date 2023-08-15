@@ -1,7 +1,15 @@
+import _root_.io.github.nafg.mergify.dsl.*
+
+
 ThisBuild / crossScalaVersions := Seq("2.13.11", "3.3.0")
 ThisBuild / scalaVersion := (ThisBuild / crossScalaVersions).value.last
 
 ThisBuild / organization := "io.github.nafg.cloudlogging"
+
+mergifyExtraConditions := Seq(
+  (Attr.Author :== "scala-steward") ||
+    (Attr.Author :== "nafg-scala-steward[bot]")
+)
 
 val noFatalWarnings = scalacOptions -= "-Xfatal-warnings"
 
