@@ -53,13 +53,13 @@ object CloudJsonLoggingAppender {
     }
 
   private object JsonToRaw extends Json.Folder[Any] {
-    override def onNull: Null                 = null
-    override def onBoolean(value: Boolean)   : Boolean = value
-    override def onNumber(value: JsonNumber) : Double = value.toDouble
-    override def onString(value: String)     : String                    = value
+    override def onNull: Null                                       = null
+    override def onBoolean(value: Boolean): Boolean                 = value
+    override def onNumber(value: JsonNumber): Double                = value.toDouble
+    override def onString(value: String): String                    = value
     override def onArray(value: Vector[Json]): util.List[Any]       =
       value.map(_.foldWith[Any](JsonToRaw)).asJava
-    override def onObject(value: JsonObject) : util.Map[String, Any] =
+    override def onObject(value: JsonObject): util.Map[String, Any] =
       value.toMap.map { case (k, v) => (k, v.foldWith[Any](JsonToRaw)) }.asJava
   }
 
