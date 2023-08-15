@@ -1,6 +1,7 @@
 package io.github.nafg.cloudlogging.appender
 
 import java.io.{PrintWriter, StringWriter}
+import java.time.Instant
 import java.util
 import java.util.Collections
 
@@ -19,7 +20,7 @@ import org.slf4j.Marker
 
 
 object CloudJsonLoggingAppender {
-  def severityFor(level: Level) =
+  private def severityFor(level: Level) =
     level match {
       case Level.TRACE | Level.DEBUG => Severity.DEBUG
       case Level.INFO                => Severity.INFO
@@ -28,13 +29,11 @@ object CloudJsonLoggingAppender {
       case _                         => Severity.DEFAULT
     }
 
-  def someMap[A, B](entries: (A, Option[B])*): Map[A, B] =
+  private def someMap[A, B](entries: (A, Option[B])*): Map[A, B] =
     entries.collect { case (k, Some(v)) => (k, v) }.toMap
 
-  def stack(
-             nullOrThrowProxy: IThrowableProxy,
-             refs: mutable.Set[IThrowableProxy]
-           ): Option[util.Map[String, AnyRef]] =
+  private def stack(nullOrThrowProxy: IThrowableProxy,
+                    refs: mutable.Set[IThrowableProxy]): Option[util.Map[String, AnyRef]] =
     Option(nullOrThrowProxy).map { throwProxy =>
       if (refs.contains(throwProxy))
         someMap("circularRef" -> Some(throwProxy.toString: AnyRef)).asJava
@@ -52,14 +51,14 @@ object CloudJsonLoggingAppender {
       }
     }
 
-  object JsonToRaw extends Json.Folder[Any] {
-    override def onNull = null
-    override def onBoolean(value: Boolean) = value
-    override def onNumber(value: JsonNumber) = value.toDouble
-    override def onString(value: String) = value
-    override def onArray(value: Vector[Json]) =
+  private object JsonToRaw extends Json.Folder[Any] {
+    override def onNull: Null                                       = null
+    override def onBoolean(value: Boolean): Boolean                 = value
+    override def onNumber(value: JsonNumber): Double                = value.toDouble
+    override def onString(value: String): String                    = value
+    override def onArray(value: Vector[Json]): util.List[Any]       =
       value.map(_.foldWith[Any](JsonToRaw)).asJava
-    override def onObject(value: JsonObject) =
+    override def onObject(value: JsonObject): util.Map[String, Any] =
       value.toMap.map { case (k, v) => (k, v.foldWith[Any](JsonToRaw)) }.asJava
   }
 
@@ -79,10 +78,11 @@ object CloudJsonLoggingAppender {
       m.getName
   }
 
-  val legalNameChars = ('a' to 'z').toSet ++ ('A' to 'Z') ++ ('0' to '9') ++ Set('/', '_', '-', '.')
-  def legalizeNameChar(c: Char) = if (legalNameChars(c)) c else '-'
+  private val legalNameChars =
+    ('a' to 'z').toSet ++ ('A' to 'Z') ++ ('0' to '9') ++ Set('/', '_', '-', '.')
+  private def legalizeNameChar(c: Char) = if (legalNameChars(c)) c else '-'
 
-  def logEntryFor(e: ILoggingEvent) = {
+  def logEntryFor(e: ILoggingEvent): LogEntry = {
     val level = e.getLevel
 
     val message =
@@ -138,7 +138,7 @@ object CloudJsonLoggingAppender {
     LogEntry
       .newBuilder(Payload.JsonPayload.of(payload.asJava))
       .setLogName(e.getLoggerName.map(legalizeNameChar))
-      .setTimestamp(e.getTimeStamp)
+      .setTimestamp(Instant.ofEpochMilli(e.getTimeStamp))
       .setSeverity(severityFor(level))
       .setLabels(labels.asJava)
       .build
