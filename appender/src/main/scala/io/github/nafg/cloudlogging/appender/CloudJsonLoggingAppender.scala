@@ -1,22 +1,22 @@
 package io.github.nafg.cloudlogging.appender
 
-import java.io.{PrintWriter, StringWriter}
-import java.time.Instant
-import java.util
-import java.util.Collections
-
-import scala.jdk.CollectionConverters._
-import scala.collection.mutable
-
-import io.github.nafg.cloudlogging.marker.JsonMarker
-
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.{ILoggingEvent, IThrowableProxy, ThrowableProxy}
+import com.google.cloud.logging.HttpRequest.RequestMethod
 import com.google.cloud.logging.Logging.WriteOption
 import com.google.cloud.logging.logback.LoggingAppender
 import com.google.cloud.logging.{Option => _, _}
 import io.circe.{Json, JsonNumber, JsonObject}
+import io.github.nafg.cloudlogging.marker.JsonMarker
 import org.slf4j.Marker
+import org.threeten.bp.Duration
+
+import java.io.{PrintWriter, StringWriter}
+import java.time.Instant
+import java.util
+import java.util.Collections
+import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 object CloudJsonLoggingAppender {
   private def severityFor(level: Level) =
@@ -64,15 +64,15 @@ object CloudJsonLoggingAppender {
   }
 
   def marker: Marker => Any = {
-    case JsonMarker(_name, data, references @ _*) =>
+    case jsonMarker: JsonMarker =>
       Map(
-        "name"       -> _name,
-        "data"       -> data.foldWith[Any](JsonToRaw),
-        "references" -> references.map(marker).toArray
+        "name"       -> jsonMarker.name,
+        "data"       -> jsonMarker.data.foldWith[Any](JsonToRaw),
+        "references" -> jsonMarker.references.map(marker).toArray
       ).asJava
-    case m if m.hasReferences                     =>
+    case m if m.hasReferences   =>
       Map("name" -> m.getName, "references" -> m.iterator.asScala.map(marker).toArray).asJava
-    case m                                        =>
+    case m                      =>
       m.getName
   }
 
@@ -125,21 +125,79 @@ object CloudJsonLoggingAppender {
             .asScala
         )
       )
-    val labels  =
+
+    val jsonMarker = e.getMarker match {
+      case jsonMarker: JsonMarker => Some(jsonMarker)
+      case _                      => None
+    }
+
+    val labels =
       Map(
         "levelName"  -> level.toString,
         "levelValue" -> String.valueOf(level.toInt),
         "threadName" -> e.getThreadName
       ) ++
-        e.getMDCPropertyMap.asScala
+        e.getMDCPropertyMap.asScala ++
+        jsonMarker.map(_.labels).getOrElse(Map.empty)
 
-    LogEntry
-      .newBuilder(Payload.JsonPayload.of(payload.asJava))
-      .setLogName(e.getLoggerName.map(legalizeNameChar))
-      .setTimestamp(Instant.ofEpochMilli(e.getTimeStamp))
-      .setSeverity(severityFor(level))
-      .setLabels(labels.asJava)
-      .build
+    val builder =
+      LogEntry
+        .newBuilder(Payload.JsonPayload.of(payload.asJava))
+        .setLogName(e.getLoggerName.map(legalizeNameChar))
+        .setTimestamp(Instant.ofEpochMilli(e.getTimeStamp))
+        .setSeverity(severityFor(level))
+        .setLabels(labels.asJava)
+
+    jsonMarker.foreach { jsonMarker =>
+      jsonMarker.httpRequest.foreach { httpRequest =>
+        val httpRequestBuilder =
+          HttpRequest
+            .newBuilder()
+            .setRequestMethod(RequestMethod.valueOf(httpRequest.requestMethod))
+            .setRequestUrl(httpRequest.requestUrl)
+            .setRemoteIp(httpRequest.remoteIp)
+
+        httpRequest.userAgent.foreach(httpRequestBuilder.setUserAgent)
+        httpRequest.referer.foreach(httpRequestBuilder.setReferer)
+        httpRequest.latency.foreach(d => httpRequestBuilder.setLatency(Duration.parse(d.toString)))
+        // noinspection DuplicatedCode
+        httpRequest.cacheLookup.foreach(httpRequestBuilder.setCacheLookup)
+        httpRequest.cacheHit.foreach(httpRequestBuilder.setCacheHit)
+        httpRequest.cacheValidatedWithOriginServer.foreach(httpRequestBuilder.setCacheValidatedWithOriginServer)
+        httpRequest.cacheFillBytes.foreach(httpRequestBuilder.setCacheFillBytes)
+
+        builder.setHttpRequest(httpRequestBuilder.build())
+      }
+
+      jsonMarker.operation.foreach { operation =>
+        builder.setOperation(
+          Operation
+            .newBuilder(operation.id, operation.producer)
+            .setFirst(operation.first)
+            .setLast(operation.last)
+            .build()
+        )
+      }
+
+      jsonMarker.sourceLocation.foreach { sourceLocation =>
+        val sourceLocationBuilder =
+          SourceLocation
+            .newBuilder()
+
+        sourceLocation.file.foreach(sourceLocationBuilder.setFile)
+        sourceLocation.line.foreach(l => sourceLocationBuilder.setLine(l))
+        sourceLocation.function.foreach(sourceLocationBuilder.setFunction)
+
+        builder.setSourceLocation(sourceLocationBuilder.build())
+      }
+
+      // noinspection DuplicatedCode
+      jsonMarker.spanId.foreach(builder.setSpanId)
+      jsonMarker.trace.foreach(builder.setTrace)
+      jsonMarker.traceSampled.foreach(builder.setTraceSampled)
+    }
+
+    builder.build
   }
 
 }
