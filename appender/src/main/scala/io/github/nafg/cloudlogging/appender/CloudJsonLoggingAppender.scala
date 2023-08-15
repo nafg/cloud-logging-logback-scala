@@ -5,7 +5,7 @@ import ch.qos.logback.classic.spi.{ILoggingEvent, IThrowableProxy, ThrowableProx
 import com.google.cloud.logging.HttpRequest.RequestMethod
 import com.google.cloud.logging.Logging.WriteOption
 import com.google.cloud.logging.logback.LoggingAppender
-import com.google.cloud.logging.{Option => _, _}
+import com.google.cloud.logging.{Option as _, *}
 import io.circe.{Json, JsonNumber, JsonObject}
 import io.github.nafg.cloudlogging.marker.JsonMarker
 import org.slf4j.Marker
@@ -16,7 +16,7 @@ import java.time.Instant
 import java.util
 import java.util.Collections
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object CloudJsonLoggingAppender {
   private def severityFor(level: Level) =
@@ -215,6 +215,6 @@ class CloudJsonLoggingAppender extends LoggingAppender {
 
   override def append(e: ILoggingEvent): Unit = {
     val logEntry = CloudJsonLoggingAppender.logEntryFor(e)
-    logging.write(Collections.singleton(logEntry), defaultWriteOptions: _*)
+    logging.write(Collections.singleton(logEntry), defaultWriteOptions*)
   }
 }

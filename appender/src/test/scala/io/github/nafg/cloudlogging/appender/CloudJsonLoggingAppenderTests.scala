@@ -1,18 +1,16 @@
 package io.github.nafg.cloudlogging.appender
 
-import java.util
-
-import scala.jdk.CollectionConverters._
-
-import io.github.nafg.cloudlogging.marker.JsonMarker
-
-import ch.qos.logback.classic.spi._
+import ch.qos.logback.classic.spi.*
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.google.cloud.logging.{Payload, Severity}
 import io.circe.Json
-import org.scalatest.Inside._
+import io.github.nafg.cloudlogging.marker.JsonMarker
+import org.scalatest.Inside.*
 import org.scalatest.funsuite.AnyFunSuite
 import org.slf4j.Marker
+
+import java.util
+import scala.jdk.CollectionConverters.*
 
 class CloudJsonLoggingAppenderTests extends AnyFunSuite {
   test("Exception") {
@@ -49,11 +47,11 @@ class CloudJsonLoggingAppenderTests extends AnyFunSuite {
       assert(message.startsWith(loggingEvent.getMessage))
     }
 
-    inside(data.get("marker")) { case marker: util.Map[_, _] =>
+    inside(data.get("marker")) { case marker: util.Map[String, String] =>
       assert(marker.get("name") == "testMarker")
     }
 
-    inside(data.get("throwable")) { case throwable: util.Map[_, _] =>
+    inside(data.get("throwable")) { case throwable: util.Map[String, String] =>
       assert(throwable.get("message") == "Some error")
       assert(throwable.containsKey("stack"))
     }
