@@ -18,7 +18,6 @@ import com.google.cloud.logging.{Option => _, _}
 import io.circe.{Json, JsonNumber, JsonObject}
 import org.slf4j.Marker
 
-
 object CloudJsonLoggingAppender {
   private def severityFor(level: Level) =
     level match {
@@ -32,53 +31,52 @@ object CloudJsonLoggingAppender {
   private def someMap[A, B](entries: (A, Option[B])*): Map[A, B] =
     entries.collect { case (k, Some(v)) => (k, v) }.toMap
 
-  private def stack(nullOrThrowProxy: IThrowableProxy,
-                    refs: mutable.Set[IThrowableProxy]): Option[util.Map[String, AnyRef]] =
+  private def stack(
+    nullOrThrowProxy: IThrowableProxy,
+    refs: mutable.Set[IThrowableProxy]
+  ): Option[util.Map[String, AnyRef]] =
     Option(nullOrThrowProxy).map { throwProxy =>
       if (refs.contains(throwProxy))
         someMap("circularRef" -> Some(throwProxy.toString: AnyRef)).asJava
       else {
         refs += throwProxy
         someMap(
-          "className" -> Some(throwProxy.getClassName),
-          "message" -> Some(throwProxy.getMessage),
-          "stack" -> Option(throwProxy.getStackTraceElementProxyArray)
+          "className"  -> Some(throwProxy.getClassName),
+          "message"    -> Some(throwProxy.getMessage),
+          "stack"      -> Option(throwProxy.getStackTraceElementProxyArray)
             .map(_.map(_.getStackTraceElement.toString)),
           "suppressed" -> Some(throwProxy.getSuppressed.map(stack(_, refs)))
             .filter(_.nonEmpty),
-          "cause" -> stack(throwProxy.getCause, refs)
+          "cause"      -> stack(throwProxy.getCause, refs)
         ).asJava
       }
     }
 
   private object JsonToRaw extends Json.Folder[Any] {
-    override def onNull: Null                                       = null
-    override def onBoolean(value: Boolean): Boolean                 = value
-    override def onNumber(value: JsonNumber): Double                = value.toDouble
-    override def onString(value: String): String                    = value
+    override def onNull: Null                 = null
+    override def onBoolean(value: Boolean)   : Boolean = value
+    override def onNumber(value: JsonNumber) : Double = value.toDouble
+    override def onString(value: String)     : String                    = value
     override def onArray(value: Vector[Json]): util.List[Any]       =
       value.map(_.foldWith[Any](JsonToRaw)).asJava
-    override def onObject(value: JsonObject): util.Map[String, Any] =
+    override def onObject(value: JsonObject) : util.Map[String, Any] =
       value.toMap.map { case (k, v) => (k, v.foldWith[Any](JsonToRaw)) }.asJava
   }
 
   def marker: Marker => Any = {
-    case JsonMarker(_name, data, references@_*) =>
+    case JsonMarker(_name, data, references @ _*) =>
       Map(
-        "name" -> _name,
-        "data" -> data.foldWith[Any](JsonToRaw),
+        "name"       -> _name,
+        "data"       -> data.foldWith[Any](JsonToRaw),
         "references" -> references.map(marker).toArray
       ).asJava
-    case m if m.hasReferences                   =>
-      Map(
-        "name" -> m.getName,
-        "references" -> m.iterator.asScala.map(marker).toArray
-      ).asJava
-    case m                                      =>
+    case m if m.hasReferences                     =>
+      Map("name" -> m.getName, "references" -> m.iterator.asScala.map(marker).toArray).asJava
+    case m                                        =>
       m.getName
   }
 
-  private val legalNameChars =
+  private val legalNameChars            =
     ('a' to 'z').toSet ++ ('A' to 'Z') ++ ('0' to '9') ++ Set('/', '_', '-', '.')
   private def legalizeNameChar(c: Char) = if (legalNameChars(c)) c else '-'
 
@@ -103,14 +101,14 @@ object CloudJsonLoggingAppender {
                 new util.IdentityHashMap[IThrowableProxy, Throwable].asScala
 
               def toThrowable(proxy: IThrowableProxy): Throwable =
-                refs.getOrElseUpdate(proxy, {
-                  val res =
-                    new Throwable(proxy.getMessage, toThrowable(proxy.getCause))
-                  proxy.getSuppressed.foreach(
-                    s => res.addSuppressed(toThrowable(s))
-                  )
-                  res
-                })
+                refs.getOrElseUpdate(
+                  proxy, {
+                    val res =
+                      new Throwable(proxy.getMessage, toThrowable(proxy.getCause))
+                    proxy.getSuppressed.foreach(s => res.addSuppressed(toThrowable(s)))
+                    res
+                  }
+                )
 
               render(toThrowable(iThrowableProxy))
           }
@@ -118,8 +116,8 @@ object CloudJsonLoggingAppender {
 
     val payload =
       someMap(
-        "message" -> Some(message),
-        "marker" -> Option(e.getMarker).map(marker),
+        "message"   -> Some(message),
+        "marker"    -> Option(e.getMarker).map(marker),
         "throwable" -> stack(
           e.getThrowableProxy,
           Collections
@@ -127,9 +125,9 @@ object CloudJsonLoggingAppender {
             .asScala
         )
       )
-    val labels =
+    val labels  =
       Map(
-        "levelName" -> level.toString,
+        "levelName"  -> level.toString,
         "levelValue" -> String.valueOf(level.toInt),
         "threadName" -> e.getThreadName
       ) ++
@@ -147,11 +145,8 @@ object CloudJsonLoggingAppender {
 }
 
 class CloudJsonLoggingAppender extends LoggingAppender {
-  private lazy val logging = LoggingOptions.getDefaultInstance.getService
-  private lazy val resource = MonitoredResourceUtil.getResource(
-    LoggingOptions.getDefaultInstance.getProjectId,
-    null
-  )
+  private lazy val logging  = LoggingOptions.getDefaultInstance.getService
+  private lazy val resource = MonitoredResourceUtil.getResource(LoggingOptions.getDefaultInstance.getProjectId, null)
   private lazy val defaultWriteOptions =
     Seq(WriteOption.logName("java.log"), WriteOption.resource(resource))
 
