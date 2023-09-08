@@ -23,7 +23,7 @@ lazy val marker =
   project
     .settings(
       adjustScalacOptions,
-      libraryDependencies += "io.circe" %% "circe-core" % "0.14.5",
+      libraryDependencies += "io.circe" %% "circe-core" % "0.14.6",
       libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.7"
     )
 
