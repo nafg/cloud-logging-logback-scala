@@ -23,7 +23,7 @@ lazy val marker =
   project
     .settings(
       adjustScalacOptions,
-      libraryDependencies += "io.circe" %% "circe-core" % "0.14.5",
+      libraryDependencies += "io.circe" %% "circe-core" % "0.14.6",
       libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.7"
     )
 
@@ -33,7 +33,7 @@ lazy val appender =
     .settings(
       adjustScalacOptions,
       libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.130.21-alpha",
-      libraryDependencies += "org.scalatest"   %% "scalatest"                    % "3.2.16" % Test
+      libraryDependencies += "org.scalatest"   %% "scalatest"                    % "3.2.17" % Test
     )
 
 publish / skip := true
