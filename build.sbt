@@ -1,6 +1,6 @@
 import _root_.io.github.nafg.mergify.dsl.*
 
-ThisBuild / crossScalaVersions := Seq("2.13.11", "3.3.1")
+ThisBuild / crossScalaVersions := Seq("2.13.12", "3.3.1")
 ThisBuild / scalaVersion       := (ThisBuild / crossScalaVersions).value.last
 
 ThisBuild / organization := "io.github.nafg.cloudlogging"
