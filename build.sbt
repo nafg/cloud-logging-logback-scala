@@ -24,7 +24,7 @@ lazy val marker =
     .settings(
       adjustScalacOptions,
       libraryDependencies += "io.circe" %% "circe-core" % "0.14.6",
-      libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.9"
+      libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.11"
     )
 
 lazy val appender =
@@ -32,7 +32,7 @@ lazy val appender =
     .dependsOn(marker)
     .settings(
       adjustScalacOptions,
-      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.130.22-alpha",
+      libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.131.0-alpha",
       libraryDependencies += "org.scalatest"   %% "scalatest"                    % "3.2.17" % Test
     )
 
