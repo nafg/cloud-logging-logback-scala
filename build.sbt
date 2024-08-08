@@ -24,7 +24,7 @@ lazy val marker =
     .settings(
       adjustScalacOptions,
       libraryDependencies += "io.circe" %% "circe-core" % "0.14.9",
-      libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.14"
+      libraryDependencies += "org.slf4j" % "slf4j-api"  % "2.0.15"
     )
 
 lazy val appender =
