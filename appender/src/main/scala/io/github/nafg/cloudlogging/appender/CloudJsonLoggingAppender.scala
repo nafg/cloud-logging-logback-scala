@@ -40,7 +40,7 @@ object CloudJsonLoggingAppender {
         someMap("circularRef" -> Some(throwProxy.toString: AnyRef)).asJava
       else {
         refs += throwProxy
-        someMap(
+        someMap[String, AnyRef](
           "className"  -> Some(throwProxy.getClassName),
           "message"    -> Some(throwProxy.getMessage),
           "stack"      -> Option(throwProxy.getStackTraceElementProxyArray)
@@ -114,21 +114,25 @@ object CloudJsonLoggingAppender {
           }
         }
 
+    val markers = e.getMarkerList.asScala.toList
+
     val payload =
       someMap(
         "message"   -> Some(message),
-        "marker"    -> Option(e.getMarker).map(marker),
+        "markers"   -> Some(markers.map(marker).asJava).filterNot(_.isEmpty),
         "throwable" -> stack(
           e.getThrowableProxy,
           Collections
             .newSetFromMap[IThrowableProxy](new util.IdentityHashMap)
             .asScala
-        )
+        ),
+        "values"    ->
+          Some(e.getKeyValuePairs.asScala.map(kv => (kv.key, kv.value)).toMap.asJava)
+            .filterNot(_.isEmpty)
       )
 
-    val jsonMarker = e.getMarker match {
-      case jsonMarker: JsonMarker => Some(jsonMarker)
-      case _                      => None
+    val jsonMarkers = markers.collect { case jsonMarker: JsonMarker =>
+      jsonMarker
     }
 
     val labels =
@@ -138,7 +142,7 @@ object CloudJsonLoggingAppender {
         "threadName" -> e.getThreadName
       ) ++
         e.getMDCPropertyMap.asScala ++
-        jsonMarker.map(_.labels).getOrElse(Map.empty)
+        jsonMarkers.flatMap(_.labels).toMap
 
     val builder =
       LogEntry
@@ -148,7 +152,7 @@ object CloudJsonLoggingAppender {
         .setSeverity(severityFor(level))
         .setLabels(labels.asJava)
 
-    jsonMarker.foreach { jsonMarker =>
+    jsonMarkers.foreach { jsonMarker =>
       jsonMarker.httpRequest.foreach { httpRequest =>
         val httpRequestBuilder =
           HttpRequest
