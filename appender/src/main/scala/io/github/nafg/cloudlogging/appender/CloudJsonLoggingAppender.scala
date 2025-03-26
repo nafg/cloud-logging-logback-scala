@@ -114,7 +114,9 @@ object CloudJsonLoggingAppender {
           }
         }
 
-    val markers = e.getMarkerList.asScala.toList
+    def toScala[A](list: util.List[A]) = if (list eq null) Nil else list.asScala.toList
+
+    val markers = toScala(e.getMarkerList)
 
     val payload =
       someMap(
@@ -127,7 +129,7 @@ object CloudJsonLoggingAppender {
             .asScala
         ),
         "values"    ->
-          Some(e.getKeyValuePairs.asScala.map(kv => (kv.key, kv.value)).toMap.asJava)
+          Some(toScala(e.getKeyValuePairs).map(kv => (kv.key, kv.value)).toMap.asJava)
             .filterNot(_.isEmpty)
       )
 
