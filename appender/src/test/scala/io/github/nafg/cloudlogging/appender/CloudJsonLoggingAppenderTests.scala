@@ -4,7 +4,6 @@ import ch.qos.logback.classic.spi.*
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.google.cloud.logging.{Payload, Severity}
 import io.circe.Json
-import io.github.nafg.cloudlogging.appender.CloudJsonLoggingAppender.marker
 import io.github.nafg.cloudlogging.marker.JsonMarker
 import org.scalatest.Inside.*
 import org.scalatest.funsuite.AnyFunSuite
