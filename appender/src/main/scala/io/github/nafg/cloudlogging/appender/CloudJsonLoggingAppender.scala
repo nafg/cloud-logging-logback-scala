@@ -219,8 +219,21 @@ class CloudJsonLoggingAppender extends LoggingAppender {
     started = true
   }
 
-  override def append(e: ILoggingEvent): Unit = {
-    val logEntry = CloudJsonLoggingAppender.logEntryFor(e)
+  private def writeLogEntry(logEntry: LogEntry): Unit =
     logging.write(Collections.singleton(logEntry), defaultWriteOptions*)
-  }
+
+  override def append(e: ILoggingEvent): Unit =
+    try {
+      writeLogEntry(CloudJsonLoggingAppender.logEntryFor(e))
+    } catch {
+      case e: Throwable =>
+        e.printStackTrace()
+        writeLogEntry(
+          LogEntry
+            .newBuilder(Payload.StringPayload.of(e.toString))
+            .setSeverity(Severity.ERROR)
+            .setLogName(getClass.getName.map(CloudJsonLoggingAppender.legalizeNameChar))
+            .build()
+        )
+    }
 }
