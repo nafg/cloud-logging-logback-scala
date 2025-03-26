@@ -5,7 +5,7 @@ inThisBuild(
     developers                          := List(
       Developer("nafg", "Naftoli Gugenheim", "98384+nafg@users.noreply.github.com", url("https://github.com/nafg"))
     ),
-    dynverGitDescribeOutput ~= (_.map(o => o.copy(dirtySuffix = sbtdynver.GitDirtySuffix("")))),
+    dynverGitDescribeOutput ~= (_.map(o => o.copy(dirtySuffix = sbtdynver.GitDirtySuffix("_")))),
     dynverSonatypeSnapshots             := true,
     githubWorkflowJavaVersions          := Seq(JavaSpec.zulu("11")),
     githubWorkflowScalaVersions         := githubWorkflowScalaVersions.value.map(_.replaceFirst("\\d+$", "x")),
