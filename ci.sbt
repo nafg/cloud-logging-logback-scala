@@ -30,5 +30,3 @@ inThisBuild(
     )
   )
 )
-
-sonatypeProfileName := "io.github.nafg"
