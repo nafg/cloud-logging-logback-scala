@@ -45,8 +45,7 @@ object CloudJsonLoggingAppender {
           "message"    -> Some(throwProxy.getMessage),
           "stack"      -> Option(throwProxy.getStackTraceElementProxyArray)
             .map(_.map(_.getStackTraceElement.toString)),
-          "suppressed" -> Some(throwProxy.getSuppressed.map(stack(_, refs)))
-            .filter(_.nonEmpty),
+          "suppressed" -> Some(throwProxy.getSuppressed.flatMap(stack(_, refs))).filter(_.nonEmpty),
           "cause"      -> stack(throwProxy.getCause, refs)
         ).asJava
       }
