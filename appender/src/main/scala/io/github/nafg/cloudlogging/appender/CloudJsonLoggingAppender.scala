@@ -215,7 +215,7 @@ class CloudJsonLoggingAppender extends LoggingAppender {
 
   override def start(): Unit = if (!isStarted) {
     logging.setFlushSeverity(CloudJsonLoggingAppender.severityFor(Level.ERROR))
-    started = true
+    super.start()
   }
 
   private def writeLogEntry(logEntry: LogEntry): Unit =
