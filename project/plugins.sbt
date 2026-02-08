@@ -1,3 +1,3 @@
-addSbtPlugin("org.typelevel"          % "sbt-tpolecat"               % "0.5.2")
+addSbtPlugin("org.typelevel"          % "sbt-tpolecat"               % "0.5.3")
 addSbtPlugin("com.github.sbt"         % "sbt-ci-release"             % "1.11.2")
 addSbtPlugin("io.github.nafg.mergify" % "sbt-mergify-github-actions" % "0.9.0")
