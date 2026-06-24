@@ -33,7 +33,7 @@ lazy val appender =
     .settings(
       adjustScalacOptions,
       libraryDependencies += "com.google.cloud" % "google-cloud-logging-logback" % "0.142.0-alpha",
-      libraryDependencies += "ch.qos.logback"   % "logback-classic"              % "1.5.34",
+      libraryDependencies += "ch.qos.logback"   % "logback-classic"              % "1.5.35",
       libraryDependencies += "org.scalatest"   %% "scalatest"                    % "3.2.20" % Test
     )
 
