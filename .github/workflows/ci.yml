@@ -12,7 +12,7 @@ on:
     branches: ['**']
   push:
     branches: ['**']
-    tags: [v*]
+    tags: [v*, v*, v*]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
         run: sbt '++ ${{ matrix.scala }}; test'
 
       - name: Compress target directories
-        run: tar cf targets.tar target marker/target appender/target project/target
+        run: tar cf targets.tar target/out/jvm/scala-3.3.8/cloud-logging-logback-scala-root target/out/jvm/scala-3.3.8/marker target/out/jvm/scala-3.3.8/appender project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v7
