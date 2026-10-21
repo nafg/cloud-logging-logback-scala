@@ -38,4 +38,4 @@ lazy val appender =
       libraryDependencies += "org.scalatest"   %% "scalatest"                    % "3.2.20" % Test
     )
 
-publish / skip := true
+LocalRootProject / publish / skip := true
